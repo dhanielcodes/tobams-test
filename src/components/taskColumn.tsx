@@ -3,7 +3,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { TaskCard, type TaskCardProps } from "./task-card";
+import { TaskCard, type TaskCardProps } from "./taskCard";
 import type { TaskStatus } from "../store/task-store";
 
 interface TaskColumnProps {

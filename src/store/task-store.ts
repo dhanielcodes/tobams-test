@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { TaskCardProps } from "../components/task-card";
+import type { TaskCardProps } from "../components/taskCard";
 
 export type TaskStatus = "todo" | "inprogress" | "done";
 

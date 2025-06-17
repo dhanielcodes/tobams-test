@@ -5,12 +5,14 @@ import { Plus, Sun, Moon, ChevronRight, ChevronDown } from "lucide-react";
 import { useThemeStore } from "../store/theme-store";
 
 interface SidebarItem {
+  id: string;
   label: string;
   count?: number;
   isActive?: boolean;
-  hasChildren?: boolean;
+  isExpandable?: boolean;
   isExpanded?: boolean;
-  children?: SidebarItem[];
+  level?: number;
+  parentId?: string;
 }
 
 interface SidebarSection {
@@ -44,79 +46,68 @@ export function Sidebar({
   const renderItem = (
     item: SidebarItem,
     sectionIndex: number,
-    itemIndex: number,
-    depth = 0
+    itemIndex: number
   ) => {
-    const paddingLeft = depth * 16 + (depth > 0 ? 16 : 0);
+    const paddingLeft = (item.level || 0) * 16 + 16;
 
     return (
-      <div key={`${sectionIndex}-${itemIndex}-${depth}`}>
-        <div
-          className={`flex items-center justify-between cursor-pointer py-2 hover:text-sidebar-accent-foreground transition-colors ${
-            item.isActive
-              ? "text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70"
-          }`}
-          style={{ paddingLeft: `${paddingLeft}px` }}
-          onClick={() => {
-            if (item.hasChildren && onToggleItem) {
-              onToggleItem(sectionIndex, itemIndex);
-            } else if (onItemClick) {
-              onItemClick(item, sectionIndex, itemIndex);
-            }
-          }}
-        >
-          <span>
-            {item.label} {item.count !== undefined && `(${item.count})`}
-          </span>
-          {item.hasChildren &&
-            (item.isExpanded ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronRight className="w-4 h-4" />
-            ))}
-        </div>
-
-        {item.hasChildren && item.isExpanded && item.children && (
-          <div>
-            {item.children.map((childItem, childIndex) =>
-              renderItem(childItem, sectionIndex, childIndex, depth + 1)
-            )}
-          </div>
-        )}
+      <div
+        key={`${sectionIndex}-${itemIndex}-${item.id}`}
+        className={`flex items-center justify-between cursor-pointer py-2 px-4 rounded-full transition-colors ${
+          item.isActive && !item.isExpandable
+            ? "text-sidebar-accent-foreground bg-sidebar-accent"
+            : item.isExpandable
+            ? "text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/30"
+            : "text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50"
+        }`}
+        style={{ paddingLeft: `${paddingLeft}px` }}
+        onClick={() => {
+          if (item.isExpandable && onToggleItem) {
+            onToggleItem(sectionIndex, itemIndex);
+          } else if (onItemClick) {
+            onItemClick(item, sectionIndex, itemIndex);
+          }
+        }}
+      >
+        <span className="text-base">
+          {item.label} {item.count !== undefined && `(${item.count})`}
+        </span>
+        {item.isExpandable &&
+          (item.isExpanded ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          ))}
       </div>
     );
   };
 
   return (
-    <div className="w-80 bg-sidebar text-sidebar-foreground p-6 flex flex-col border-r border-sidebar-border">
-      {/* Logo */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-8 h-8 bg-sidebar-accent rounded-lg flex items-center justify-center">
-          <div className="w-4 h-4 bg-sidebar-accent-foreground rounded-sm"></div>
-        </div>
+    <div className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
+      {/* Header */}
+      <div className="p-6 flex justify-between">
+        <h1 className="text-xl font-semibold text-sidebar-foreground">
+          Projects
+        </h1>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="bg-accent rounded-full w-8 h-8"
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Navigation Sections */}
-      <div className="space-y-6 flex-1">
+      <div className="flex-1 p-4">
         {sections.map((section, sectionIndex) => (
           <div key={sectionIndex}>
-            <div className="flex items-center justify-between mb-4">
-              <h2
-                className={`text-xl font-semibold cursor-pointer ${
-                  section.isExpanded !== false
-                    ? "text-sidebar-foreground"
-                    : "text-sidebar-foreground/70"
-                }`}
-                onClick={() => onToggleSection?.(sectionIndex)}
-              >
-                {section.title}
-              </h2>
+            <div className="flex items-center justify-between mb-3">
               {section.hasAddButton && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
+                  className="h-6 w-6 p-0 text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
                   onClick={() => onAddClick?.(sectionIndex)}
                 >
                   <Plus className="w-4 h-4" />
@@ -125,7 +116,7 @@ export function Sidebar({
             </div>
 
             {section.isExpanded !== false && (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {section.items.map((item, itemIndex) =>
                   renderItem(item, sectionIndex, itemIndex)
                 )}
@@ -136,33 +127,34 @@ export function Sidebar({
       </div>
 
       {/* Theme Toggle */}
-      <div className="flex justify-between items-center gap-2 p-3 bg-accent rounded-full w-full">
-        <div
-          className={`flex items-center justify-center gap-2 cursor-pointer transition-colors ${
-            theme === "light"
-              ? "text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:text-sidebar-accent-foreground"
-          }`}
-          onClick={() => setTheme("light")}
-        >
-          <Sun className="w-4 h-4" />
-          <span className="text-sm">Light</span>
-        </div>
-        <div
-          className={`flex items-center justify-center gap-2 cursor-pointer ml-4 transition-colors ${
-            theme === "dark"
-              ? "text-sidebar-accent-foreground"
-              : "text-sidebar-foreground/70 hover:text-sidebar-accent-foreground"
-          }`}
-          onClick={() => setTheme("dark")}
-        >
-          <Moon className="w-4 h-4" />
-          <span className="text-sm">Dark</span>
+      <div className="p-4">
+        <div className="bg-sidebar-accent/50 rounded-full p-1 flex items-center">
+          <button
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+              theme === "light"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            }`}
+            onClick={() => setTheme("light")}
+          >
+            <Sun className="w-4 h-4" />
+            <span>Light</span>
+          </button>
+          <button
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+              theme === "dark"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            }`}
+            onClick={() => setTheme("dark")}
+          >
+            <Moon className="w-4 h-4" />
+            <span>Dark</span>
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-// Export types for external use
 export type { SidebarProps, SidebarSection, SidebarItem };

@@ -1,7 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { MoreHorizontal, MessageCircle, Paperclip } from "lucide-react";
+import {
+  MoreHorizontal,
+  MessageCircle,
+  Paperclip,
+  Calendar,
+  List,
+} from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -71,7 +77,7 @@ export function TaskCard({
           <Button
             variant="ghost"
             size="sm"
-            className="bg-accent rounded-full w-8 h-8"
+            className="border-accent border-2 rounded-full w-8 h-8"
           >
             <MoreHorizontal className="w-4 h-4" />
           </Button>
@@ -80,7 +86,9 @@ export function TaskCard({
       <CardContent className="pt-0">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Progress</span>
+            <span className="text-sm text-muted-foreground flex items-center space-x-2">
+              <List className="w-4 h-4" /> <span>Progress</span>
+            </span>
             <span className="text-sm font-medium">{progressText}</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2">
@@ -93,7 +101,13 @@ export function TaskCard({
             />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">{date}</span>
+            {/* Updated Date Design to match Figma */}
+            <div className="flex items-center gap-1.5 bg-muted/50 px-4 py-2 rounded-full">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">
+                {date}
+              </span>
+            </div>
             <div className="flex items-center gap-3">
               {comments > 0 && (
                 <div className="flex items-center gap-1">
