@@ -34,7 +34,6 @@ export function NavigationBar({
 
   const handleLogout = () => {
     console.log("Logout clicked");
-    // Add logout logic here
     onItemClick?.("logout");
   };
 

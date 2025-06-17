@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   type DragEndEvent,
@@ -48,10 +48,14 @@ export default function Component() {
   const [activeNavItem, setActiveNavItem] = useState("grid");
   const [activeView, setActiveView] = useState<ViewType>("board");
   const [showAddViewOptions, setShowAddViewOptions] = useState(false);
-  const [activeSidebarItem, setActiveSidebarItem] = useState("all-tasks"); // Track active sidebar item
+  const [activeSidebarItem, setActiveSidebarItem] = useState("all-tasks");
 
   const { moveTask, getTaskById, addTask, getTaskCount } = useTaskStore();
+  const { fetchAllTasks, isLoading } = useTaskStore();
 
+  useEffect(() => {
+    fetchAllTasks();
+  }, [fetchAllTasks]);
   const taskColumns = useTaskColumns();
 
   const viewOptions: ViewOption[] = [
@@ -340,7 +344,7 @@ export default function Component() {
   const currentViewOption = viewOptions.find(
     (option) => option.id === activeView
   );
-
+  console.log(taskColumns, "taskColumns");
   return (
     <ThemeProvider>
       <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -454,15 +458,16 @@ export default function Component() {
                 <div className="grid grid-cols-3 gap-6 h-full">
                   {taskColumns.map((column) => (
                     <TaskColumn
-                      key={column.id}
-                      id={column.id}
-                      title={column.title}
-                      count={column.count}
-                      tasks={column.tasks}
+                      key={column?.id}
+                      id={column?.id}
+                      title={column?.title}
+                      count={column?.count}
+                      tasks={column?.tasks}
+                      isLoading={column?.isLoading}
                       showDropZone={
-                        column.id === "done" && column.tasks.length === 0
+                        column?.id === "done" && column?.tasks?.length === 0
                       }
-                      onAddTask={() => handleAddTask(column.id)}
+                      onAddTask={() => handleAddTask(column?.id)}
                     />
                   ))}
                 </div>

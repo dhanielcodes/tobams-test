@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { TaskCardProps } from "../components/taskCard";
+import {
+  fetchTodoTasks,
+  fetchInProgressTasks,
+  fetchDoneTasks,
+} from "../services/api";
 
 export type TaskStatus = "todo" | "inprogress" | "done";
 
@@ -22,155 +27,80 @@ export interface TaskState {
   getTaskById: (taskId: string) => TaskCardProps | undefined;
   getTaskCount: (status: TaskStatus) => number;
   getAllTasks: () => TaskCardProps[];
+
+  isLoading: {
+    todo: boolean;
+    inprogress: boolean;
+    done: boolean;
+  };
+
+  fetchTodoTasks: () => Promise<void>;
+  fetchInProgressTasks: () => Promise<void>;
+  fetchDoneTasks: () => Promise<void>;
+  fetchAllTasks: () => Promise<void>;
 }
-
-const initialTodoTasks: TaskCardProps[] = [
-  {
-    id: "task-1",
-    title: "Design new ui presentation",
-    description: "Dribbble marketing",
-    progress: 70,
-    progressText: "7/10",
-    date: "24 Aug 2022",
-    comments: 7,
-    attachments: 2,
-    avatars: [],
-    color: "orange",
-  },
-  {
-    id: "task-2",
-    title: "Add more ui/ux mockups",
-    description: "Pinterest promotion",
-    progress: 40,
-    progressText: "4/10",
-    date: "25 Aug 2022",
-    comments: 0,
-    attachments: 2,
-    avatars: ["/placeholder.svg", "/placeholder.svg"],
-    color: "orange",
-  },
-  {
-    id: "task-3",
-    title: "Design few mobile screens",
-    description: "Dropbox mobile app",
-    progress: 30,
-    progressText: "3/10",
-    date: "26 Aug 2022",
-    comments: 6,
-    attachments: 4,
-    avatars: [],
-    color: "red",
-  },
-  {
-    id: "task-4",
-    title: "Create a tweet and promote",
-    description: "Twitter marketing",
-    progress: 14,
-    progressText: "2/14",
-    date: "27 Aug 2022",
-    comments: 0,
-    attachments: 2,
-    avatars: ["/placeholder.svg", "/placeholder.svg"],
-    color: "red",
-  },
-];
-
-const initialInProgressTasks: TaskCardProps[] = [
-  {
-    id: "task-5",
-    title: "Design system update",
-    description: "Oreo website project",
-    progress: 30,
-    progressText: "3/10",
-    date: "12 Nov 2022",
-    comments: 0,
-    attachments: 2,
-    avatars: ["/placeholder.svg", "/placeholder.svg"],
-    color: "orange",
-  },
-  {
-    id: "task-6",
-    title: "Create brand guideline",
-    description: "Oreo branding project",
-    progress: 70,
-    progressText: "7/10",
-    date: "13 Nov 2022",
-    comments: 2,
-    attachments: 13,
-    avatars: [],
-    color: "orange",
-  },
-  {
-    id: "task-7",
-    title: "Create wireframe for ios app",
-    description: "Oreo ios app project",
-    progress: 40,
-    progressText: "4/10",
-    date: "14 Nov 2022",
-    comments: 0,
-    attachments: 2,
-    avatars: ["/placeholder.svg", "/placeholder.svg"],
-    color: "red",
-  },
-  {
-    id: "task-8",
-    title: "Create ui kit for layout",
-    description: "Crypto mobile app",
-    progress: 30,
-    progressText: "3/10",
-    date: "15 Nov 2022",
-    comments: 23,
-    attachments: 12,
-    avatars: [],
-    color: "red",
-  },
-];
-
-const initialDoneTasks: TaskCardProps[] = [
-  {
-    id: "task-9",
-    title: "Add product to the market",
-    description: "UI8 marketplace",
-    progress: 100,
-    progressText: "10/10",
-    date: "6 Jan 2022",
-    comments: 1,
-    attachments: 5,
-    avatars: [],
-    color: "green",
-  },
-  {
-    id: "task-10",
-    title: "Launch product promotion",
-    description: "Kickstarter campaign",
-    progress: 100,
-    progressText: "10/10",
-    date: "7 Jan 2022",
-    comments: 17,
-    attachments: 3,
-    avatars: [],
-    color: "green",
-  },
-  {
-    id: "task-11",
-    title: "Make twitter banner",
-    description: "Twitter marketing",
-    progress: 100,
-    progressText: "10/10",
-    date: "8 Jan 2022",
-    comments: 0,
-    attachments: 2,
-    avatars: ["/placeholder.svg", "/placeholder.svg"],
-    color: "green",
-  },
-];
 
 export const useTaskStore = create<TaskState>()(
   devtools(
     (set, get) => ({
-      todoTasks: initialTodoTasks,
-      inProgressTasks: initialInProgressTasks,
-      doneTasks: initialDoneTasks,
+      todoTasks: [],
+      inProgressTasks: [],
+      doneTasks: [],
+
+      isLoading: {
+        todo: false,
+        inprogress: false,
+        done: false,
+      },
+
+      fetchTodoTasks: async () => {
+        set((state) => ({ isLoading: { ...state.isLoading, todo: true } }));
+        try {
+          const response = await fetchTodoTasks();
+          set({ todoTasks: response.data });
+        } catch (error) {
+          console.error("Failed to fetch todo tasks:", error);
+        } finally {
+          set((state) => ({ isLoading: { ...state.isLoading, todo: false } }));
+        }
+      },
+
+      fetchInProgressTasks: async () => {
+        set((state) => ({
+          isLoading: { ...state.isLoading, inprogress: true },
+        }));
+        try {
+          const response = await fetchInProgressTasks();
+          set({ inProgressTasks: response.data });
+        } catch (error) {
+          console.error("Failed to fetch in-progress tasks:", error);
+        } finally {
+          set((state) => ({
+            isLoading: { ...state.isLoading, inprogress: false },
+          }));
+        }
+      },
+
+      fetchDoneTasks: async () => {
+        set((state) => ({ isLoading: { ...state.isLoading, done: true } }));
+        try {
+          const response = await fetchDoneTasks();
+          set({ doneTasks: response.data });
+        } catch (error) {
+          console.error("Failed to fetch done tasks:", error);
+        } finally {
+          set((state) => ({ isLoading: { ...state.isLoading, done: false } }));
+        }
+      },
+
+      fetchAllTasks: async () => {
+        const { fetchTodoTasks, fetchInProgressTasks, fetchDoneTasks } = get();
+        await Promise.all([
+          fetchTodoTasks(),
+          fetchInProgressTasks(),
+          fetchDoneTasks(),
+        ]);
+      },
 
       moveTask: (
         taskId: string,
@@ -307,7 +237,7 @@ export const useTaskStore = create<TaskState>()(
 
       getTaskCount: (status: TaskStatus) => {
         const state = get();
-        return state.getTasksByStatus(status).length;
+        return state.getTasksByStatus(status)?.length;
       },
 
       getAllTasks: () => {

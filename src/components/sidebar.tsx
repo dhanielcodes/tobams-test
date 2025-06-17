@@ -100,19 +100,6 @@ export function Sidebar({
       <div className="flex-1 p-4">
         {sections.map((section, sectionIndex) => (
           <div key={sectionIndex}>
-            <div className="flex items-center justify-between mb-3">
-              {section.hasAddButton && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0 text-sidebar-foreground/70 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent"
-                  onClick={() => onAddClick?.(sectionIndex)}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-
             {section.isExpanded !== false && (
               <div className="space-y-1">
                 {section.items.map((item, itemIndex) =>
