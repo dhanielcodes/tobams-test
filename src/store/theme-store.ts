@@ -15,7 +15,6 @@ export const useThemeStore = create<ThemeState>()(
       theme: "dark",
       setTheme: (theme: Theme) => {
         set({ theme });
-        // Apply theme to document
         if (typeof window !== "undefined") {
           const root = window.document.documentElement;
           root.classList.remove("light", "dark");
@@ -31,7 +30,6 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: "theme-storage",
       onRehydrateStorage: () => (state) => {
-        // Apply theme on hydration
         if (state && typeof window !== "undefined") {
           const root = window.document.documentElement;
           root.classList.remove("light", "dark");

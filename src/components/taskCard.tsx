@@ -101,7 +101,6 @@ export function TaskCard({
             />
           </div>
           <div className="flex items-center justify-between">
-            {/* Updated Date Design to match Figma */}
             <div className="flex items-center gap-1.5 bg-muted/50 px-4 py-2 rounded-full">
               <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-xs text-muted-foreground font-medium">

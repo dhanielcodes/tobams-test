@@ -83,8 +83,7 @@ export function Sidebar({
   };
 
   return (
-    <div className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
-      {/* Header */}
+    <div className="w-64 bg-sidebar text-sidebar-foreground flex flex-col">
       <div className="p-6 flex justify-between">
         <h1 className="text-xl font-semibold text-sidebar-foreground">
           Projects
@@ -98,7 +97,6 @@ export function Sidebar({
         </Button>
       </div>
 
-      {/* Navigation Sections */}
       <div className="flex-1 p-4">
         {sections.map((section, sectionIndex) => (
           <div key={sectionIndex}>
@@ -126,7 +124,6 @@ export function Sidebar({
         ))}
       </div>
 
-      {/* Theme Toggle */}
       <div className="p-4">
         <div className="bg-sidebar-accent/50 rounded-full p-1 flex items-center">
           <button

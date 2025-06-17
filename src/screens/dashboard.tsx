@@ -154,7 +154,7 @@ export default function Component() {
             getTaskCount("done"),
           level: 1,
           parentId: "tasks",
-          isActive: true, // Set default active item
+          isActive: true,
         },
         {
           id: "todo-tasks",
@@ -244,11 +244,9 @@ export default function Component() {
     sectionIndex: number,
     itemIndex: number
   ) => {
-    // Only set active state for clickable items (not expandable headers)
     if (!item.isExpandable) {
       setActiveSidebarItem(item.id);
 
-      // Update the sidebar sections to reflect the new active state
       setSidebarSections((prevSections) =>
         prevSections.map((section) => ({
           ...section,
@@ -265,7 +263,6 @@ export default function Component() {
 
   const handleSidebarAddClick = (sectionIndex: number) => {
     console.log("Add button clicked for section:", sectionIndex);
-    // Handle adding new items to the section
   };
 
   const handleSidebarToggleSection = (sectionIndex: number) => {
@@ -286,7 +283,6 @@ export default function Component() {
         return {
           ...section,
           items: section.items.map((item, iIndex) => {
-            // Toggle the clicked expandable item
             if (iIndex === itemIndex && item.isExpandable) {
               return { ...item, isExpanded: !item.isExpanded };
             }
@@ -354,7 +350,6 @@ export default function Component() {
             onItemClick={handleNavItemClick}
           />
 
-          {/* Main Sidebar */}
           <Sidebar
             sections={getFilteredSections()}
             onItemClick={handleSidebarItemClick}
@@ -363,7 +358,6 @@ export default function Component() {
             onToggleItem={handleSidebarToggleItem}
           />
 
-          {/* Main Content */}
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="bg-muted/30 px-8 py-4">
               <div className="flex items-center justify-between">
@@ -388,7 +382,6 @@ export default function Component() {
             <div className="bg-muted/30 px-8 pt-4 relative">
               <div className="flex items-center justify-between border-b border-border">
                 <div className="flex items-center gap-6 relative">
-                  {/* Active View */}
                   <button
                     onClick={() => handleViewChange(activeView)}
                     className="text-foreground text-base flex items-center space-x-2 pb-4 hover:text-foreground/80 transition-colors relative border-b-2 border-primary"
